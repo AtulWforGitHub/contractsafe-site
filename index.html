@@ -1830,6 +1830,12 @@ Works on: Employment · Rent · Sale Deed · Loan · NDA · Vendor · Freelance"
 
 
 
+
+
+
+
+
+
 (function(){
 
 /* ─── CONFIG ─── */
@@ -1842,42 +1848,21 @@ var _CSRK = "rzp_live_STaVeR7OUN2hui"; // Your Razorpay key
 async function callClaude(payload) {
   // Try direct first (works if deployed on a server with proper headers)
   // Falls back to CORS proxy for local HTML file usage
-  const ENDPOINT = '/.netlify/functions/claude-proxy';
+  const ENDPOINT = 'https://contractsafe-email-production.up.railway.app/api/claude';
   const HEADERS = {
     'Content-Type': 'application/json',
-    'x-api-key': _CSAK,
     'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-allow-browser': 'true',
-        'anthropic-dangerous-allow-browser': 'true',
-    'anthropic-dangerous-allow-browser': 'true'
-  };
+    };
 
-  // Try direct call first
-  try {
-    const resp = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: HEADERS,
-      body: JSON.stringify(payload)
-    });
-    if (resp.ok) return resp;
-    // If 4xx/5xx, throw to show real error
-    const errData = await resp.json().catch(()=>({}));
-    throw new Error(errData?.error?.message || 'API error ' + resp.status);
-  } catch(e) {
-    // Network/CORS error — try via proxy
-    if (e.message.includes('fetch') || e.message.includes('CORS') || e.message.includes('Failed')) {
-      const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(ENDPOINT);
-      const resp2 = await fetch(proxyUrl, {
-        method: 'POST',
-        headers: HEADERS,
-        body: JSON.stringify(payload)
-      });
-      if (resp2.ok) return resp2;
-      const errData2 = await resp2.json().catch(()=>({}));
-      throw new Error(errData2?.error?.message || 'API error ' + resp2.status);
-    }
-    throw e;
-  }
+  // Direct API call with browser flag
+  const resp = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify(payload)
+  });
+  if (resp.ok) return resp;
+  const errData = await resp.json().catch(()=>({}));
+  throw new Error(errData?.error?.message || 'API error ' + resp.status);
 }
 
 /* ─── STATE ─── */
@@ -3196,6 +3181,45 @@ try{window.setDTfromSelect=setDTfromSelect}catch(e){}
 try{window.setLangFromSelect=setLangFromSelect}catch(e){}
 try{window.setRoleFromSelect=setRoleFromSelect}catch(e){}
 try{window.showF=showF}catch(e){}
+try{window.askSug=askSug}catch(e){}
+try{window.clearChat=clearChat}catch(e){}
+try{window.clearResults=clearResults}catch(e){}
+try{window.clearVault=clearVault}catch(e){}
+try{window.closeAuth=closeAuth}catch(e){}
+try{window.closeDrawer=closeDrawer}catch(e){}
+try{window.cm=cm}catch(e){}
+try{window.cmpClearFile=cmpClearFile}catch(e){}
+try{window.cmpDzDp=cmpDzDp}catch(e){}
+try{window.cmpDzLv=cmpDzLv}catch(e){}
+try{window.cmpDzOv=cmpDzOv}catch(e){}
+try{window.cmpHandleFile=cmpHandleFile}catch(e){}
+try{window.cmpTab=cmpTab}catch(e){}
+try{window.cpyEmail=cpyEmail}catch(e){}
+try{window.doPay=doPay}catch(e){}
+try{window.doSignIn=doSignIn}catch(e){}
+try{window.doSignUp=doSignUp}catch(e){}
+try{window.dzDp=dzDp}catch(e){}
+try{window.dzLv=dzLv}catch(e){}
+try{window.dzOv=dzOv}catch(e){}
+try{window.enterApp=enterApp}catch(e){}
+try{window.exportPDF=exportPDF}catch(e){}
+try{window.exportWord=exportWord}catch(e){}
+try{window.genEmail=genEmail}catch(e){}
+try{window.goHome=goHome}catch(e){}
+try{window.goLanding=goLanding}catch(e){}
+try{window.handleF=handleF}catch(e){}
+try{window.openAuth=openAuth}catch(e){}
+try{window.openDrawer=openDrawer}catch(e){}
+try{window.rewriteClause=rewriteClause}catch(e){}
+try{window.runAnalysis=runAnalysis}catch(e){}
+try{window.runCompare=runCompare}catch(e){}
+try{window.sPlan=sPlan}catch(e){}
+try{window.saveToVault=saveToVault}catch(e){}
+try{window.sendChat=sendChat}catch(e){}
+try{window.setDTfromSelect=setDTfromSelect}catch(e){}
+try{window.setLangFromSelect=setLangFromSelect}catch(e){}
+try{window.setRoleFromSelect=setRoleFromSelect}catch(e){}
+try{window.showF=showF}catch(e){}
 try{window.showLegalPage=showLegalPage}catch(e){}
 try{window.showPaywall=showPaywall}catch(e){}
 try{window.showWI=showWI}catch(e){}
@@ -3205,6 +3229,229 @@ try{window.swTab=swTab}catch(e){}
 try{window.switchMain=switchMain}catch(e){}
 try{window.toggleFAQ=toggleFAQ}catch(e){}
 })();
+try{window.askSug=askSug}catch(e){}
+try{window.clearChat=clearChat}catch(e){}
+try{window.clearResults=clearResults}catch(e){}
+try{window.clearVault=clearVault}catch(e){}
+try{window.closeAuth=closeAuth}catch(e){}
+try{window.closeDrawer=closeDrawer}catch(e){}
+try{window.cm=cm}catch(e){}
+try{window.cmpClearFile=cmpClearFile}catch(e){}
+try{window.cmpDzDp=cmpDzDp}catch(e){}
+try{window.cmpDzLv=cmpDzLv}catch(e){}
+try{window.cmpDzOv=cmpDzOv}catch(e){}
+try{window.cmpHandleFile=cmpHandleFile}catch(e){}
+try{window.cmpTab=cmpTab}catch(e){}
+try{window.cpyEmail=cpyEmail}catch(e){}
+try{window.doPay=doPay}catch(e){}
+try{window.doSignIn=doSignIn}catch(e){}
+try{window.doSignUp=doSignUp}catch(e){}
+try{window.dzDp=dzDp}catch(e){}
+try{window.dzLv=dzLv}catch(e){}
+try{window.dzOv=dzOv}catch(e){}
+try{window.enterApp=enterApp}catch(e){}
+try{window.exportPDF=exportPDF}catch(e){}
+try{window.exportWord=exportWord}catch(e){}
+try{window.genEmail=genEmail}catch(e){}
+try{window.goHome=goHome}catch(e){}
+try{window.goLanding=goLanding}catch(e){}
+try{window.handleF=handleF}catch(e){}
+try{window.openAuth=openAuth}catch(e){}
+try{window.openDrawer=openDrawer}catch(e){}
+try{window.rewriteClause=rewriteClause}catch(e){}
+try{window.runAnalysis=runAnalysis}catch(e){}
+try{window.runCompare=runCompare}catch(e){}
+try{window.sPlan=sPlan}catch(e){}
+try{window.saveToVault=saveToVault}catch(e){}
+try{window.sendChat=sendChat}catch(e){}
+try{window.setDTfromSelect=setDTfromSelect}catch(e){}
+try{window.setLangFromSelect=setLangFromSelect}catch(e){}
+try{window.setRoleFromSelect=setRoleFromSelect}catch(e){}
+try{window.showF=showF}catch(e){}
+function demoResult(dt){return{doc_type:dt==='employment'?'Employment Contract':'Contract',overall_risk:'High',verdict:'DO NOT sign as-is. Negotiate before signing.',risk_score_reason:'Key clauses deviate from Indian standard practice.',clarifications_needed:[],summary:'This contract has several clauses that are non-standard under Indian law. The non-compete is overly broad, the notice period is imbalanced, and variable pay has no objective criteria.',parties:[{role:'Party A',name:'[Company]'},{role:'Party B',name:'[You]'}],key_dates:[{label:'Notice Period',value:'90 days'},{label:'Non-compete',value:'24 months'}],risk_table:[{clause:'Non-Compete',risk_level:'High',why_risky:'Covers entire sector for 24 months',india_standard:'Non-Standard',real_consequence:'Cannot work in field for 2 years. Loss: ₹8-20L',what_if:'Company can file injunction. Legal costs ₹2-5L'},{clause:'Notice Period',risk_level:'High',why_risky:'90 days for you, 7 days for employer',india_standard:'Non-Standard',real_consequence:'Can be let go with 1 week notice',what_if:'Terminated Monday, paid for 7 days only'},{clause:'Variable Pay',risk_level:'Medium',why_risky:'40% at management discretion, no KPIs',india_standard:'Non-Standard',real_consequence:'₹3-8L at risk annually',what_if:'Can be withheld with no recourse'}],indian_compliance:[{law:'Indian Contract Act 1872',check:'Validity',status:'OK',note:'Contract is valid'},{law:'Section 27',check:'Non-compete',status:'WARN',note:'Broad non-compete may be unenforceable'}],benefits:['Base salary','Annual bonus eligibility','Health insurance'],obligations:['90-day notice period','3-year confidentiality','Non-compete 24 months'],important_clauses:['Termination imbalance','Mandatory arbitration'],missing_protections:['No severance clause','No objective KPIs'],negotiation_points:['Narrow non-compete to named competitors','Equal notice period','Written KPI targets'],action_checklist:['Do NOT sign until non-compete is narrowed','Request equal notice period','Get KPIs in writing','Consult a lawyer (₹2000-5000)']}}
+
+function demoCompare(){return{summary:'V2 shows partial improvement but one clause worsened.',changes_count:{improved:2,worsened:1,unchanged:3,new_added:1},improved:[{clause:'Non-compete Duration',v1:'24 months',v2:'12 months',note:'Reduced but still long'},{clause:'Notice Period',v1:'90/7 days',v2:'60/60 days',note:'Now equal'}],worsened:[{clause:'IP Ownership',v1:'Work IP only',v2:'All devices IP',note:'Scope expanded'}],new_clauses:[{clause:'Mandatory Arbitration',risk:'High',note:'New clause adds 12-18 months to disputes'}],still_missing:['No severance','No objective KPIs'],verdict:'Mixed result. Two improvements but IP worsened and new arbitration clause added.',recommendation:'Negotiate IP clause and arbitration before signing'}}
+
+try{window.askSug=askSug}catch(e){}
+try{window.clearChat=clearChat}catch(e){}
+try{window.clearResults=clearResults}catch(e){}
+try{window.clearVault=clearVault}catch(e){}
+try{window.closeAuth=closeAuth}catch(e){}
+try{window.closeDrawer=closeDrawer}catch(e){}
+try{window.cm=cm}catch(e){}
+try{window.cmpClearFile=cmpClearFile}catch(e){}
+try{window.cmpDzDp=cmpDzDp}catch(e){}
+try{window.cmpDzLv=cmpDzLv}catch(e){}
+try{window.cmpDzOv=cmpDzOv}catch(e){}
+try{window.cmpHandleFile=cmpHandleFile}catch(e){}
+try{window.cmpTab=cmpTab}catch(e){}
+try{window.cpyEmail=cpyEmail}catch(e){}
+try{window.doPay=doPay}catch(e){}
+try{window.doSignIn=doSignIn}catch(e){}
+try{window.doSignUp=doSignUp}catch(e){}
+try{window.dzDp=dzDp}catch(e){}
+try{window.dzLv=dzLv}catch(e){}
+try{window.dzOv=dzOv}catch(e){}
+try{window.enterApp=enterApp}catch(e){}
+try{window.exportPDF=exportPDF}catch(e){}
+try{window.exportWord=exportWord}catch(e){}
+try{window.genEmail=genEmail}catch(e){}
+try{window.goHome=goHome}catch(e){}
+try{window.goLanding=goLanding}catch(e){}
+try{window.handleF=handleF}catch(e){}
+try{window.openAuth=openAuth}catch(e){}
+try{window.openDrawer=openDrawer}catch(e){}
+try{window.rewriteClause=rewriteClause}catch(e){}
+try{window.runAnalysis=runAnalysis}catch(e){}
+try{window.runCompare=runCompare}catch(e){}
+try{window.sPlan=sPlan}catch(e){}
+try{window.saveToVault=saveToVault}catch(e){}
+try{window.sendChat=sendChat}catch(e){}
+try{window.setDTfromSelect=setDTfromSelect}catch(e){}
+try{window.setLangFromSelect=setLangFromSelect}catch(e){}
+try{window.setRoleFromSelect=setRoleFromSelect}catch(e){}
+try{window.showF=showF}catch(e){}
+try{window.askSug=askSug}catch(e){}
+try{window.clearChat=clearChat}catch(e){}
+try{window.clearResults=clearResults}catch(e){}
+try{window.clearVault=clearVault}catch(e){}
+try{window.closeAuth=closeAuth}catch(e){}
+try{window.closeDrawer=closeDrawer}catch(e){}
+try{window.cm=cm}catch(e){}
+try{window.cmpClearFile=cmpClearFile}catch(e){}
+try{window.cmpDzDp=cmpDzDp}catch(e){}
+try{window.cmpDzLv=cmpDzLv}catch(e){}
+try{window.cmpDzOv=cmpDzOv}catch(e){}
+try{window.cmpHandleFile=cmpHandleFile}catch(e){}
+try{window.cmpTab=cmpTab}catch(e){}
+try{window.cpyEmail=cpyEmail}catch(e){}
+try{window.doPay=doPay}catch(e){}
+try{window.doSignIn=doSignIn}catch(e){}
+try{window.doSignUp=doSignUp}catch(e){}
+try{window.dzDp=dzDp}catch(e){}
+try{window.dzLv=dzLv}catch(e){}
+try{window.dzOv=dzOv}catch(e){}
+try{window.enterApp=enterApp}catch(e){}
+try{window.exportPDF=exportPDF}catch(e){}
+try{window.exportWord=exportWord}catch(e){}
+try{window.genEmail=genEmail}catch(e){}
+try{window.goHome=goHome}catch(e){}
+try{window.goLanding=goLanding}catch(e){}
+try{window.handleF=handleF}catch(e){}
+try{window.openAuth=openAuth}catch(e){}
+try{window.openDrawer=openDrawer}catch(e){}
+try{window.rewriteClause=rewriteClause}catch(e){}
+try{window.runAnalysis=runAnalysis}catch(e){}
+try{window.runCompare=runCompare}catch(e){}
+try{window.sPlan=sPlan}catch(e){}
+try{window.saveToVault=saveToVault}catch(e){}
+try{window.sendChat=sendChat}catch(e){}
+try{window.setDTfromSelect=setDTfromSelect}catch(e){}
+try{window.setLangFromSelect=setLangFromSelect}catch(e){}
+try{window.setRoleFromSelect=setRoleFromSelect}catch(e){}
+try{window.showF=showF}catch(e){}
+try{window.showLegalPage=showLegalPage}catch(e){}
+try{window.showPaywall=showPaywall}catch(e){}
+try{window.showWI=showWI}catch(e){}
+try{window.sid=sid}catch(e){}
+try{window.signOut=signOut}catch(e){}
+try{window.swTab=swTab}catch(e){}
+try{window.switchMain=switchMain}catch(e){}
+try{window.toggleFAQ=toggleFAQ}catch(e){}
+try{window.askSug=askSug}catch(e){}
+try{window.clearChat=clearChat}catch(e){}
+try{window.clearResults=clearResults}catch(e){}
+try{window.clearVault=clearVault}catch(e){}
+try{window.closeAuth=closeAuth}catch(e){}
+try{window.closeDrawer=closeDrawer}catch(e){}
+try{window.cm=cm}catch(e){}
+try{window.cmpClearFile=cmpClearFile}catch(e){}
+try{window.cmpDzDp=cmpDzDp}catch(e){}
+try{window.cmpDzLv=cmpDzLv}catch(e){}
+try{window.cmpDzOv=cmpDzOv}catch(e){}
+try{window.cmpHandleFile=cmpHandleFile}catch(e){}
+try{window.cmpTab=cmpTab}catch(e){}
+try{window.cpyEmail=cpyEmail}catch(e){}
+try{window.doPay=doPay}catch(e){}
+try{window.doSignIn=doSignIn}catch(e){}
+try{window.doSignUp=doSignUp}catch(e){}
+try{window.dzDp=dzDp}catch(e){}
+try{window.dzLv=dzLv}catch(e){}
+try{window.dzOv=dzOv}catch(e){}
+try{window.enterApp=enterApp}catch(e){}
+try{window.exportPDF=exportPDF}catch(e){}
+try{window.exportWord=exportWord}catch(e){}
+try{window.genEmail=genEmail}catch(e){}
+try{window.goHome=goHome}catch(e){}
+try{window.goLanding=goLanding}catch(e){}
+try{window.handleF=handleF}catch(e){}
+try{window.openAuth=openAuth}catch(e){}
+try{window.openDrawer=openDrawer}catch(e){}
+try{window.rewriteClause=rewriteClause}catch(e){}
+try{window.runAnalysis=runAnalysis}catch(e){}
+try{window.runCompare=runCompare}catch(e){}
+try{window.sPlan=sPlan}catch(e){}
+try{window.saveToVault=saveToVault}catch(e){}
+try{window.sendChat=sendChat}catch(e){}
+try{window.setDTfromSelect=setDTfromSelect}catch(e){}
+try{window.setLangFromSelect=setLangFromSelect}catch(e){}
+try{window.setRoleFromSelect=setRoleFromSelect}catch(e){}
+try{window.showF=showF}catch(e){}
+try{window.showLegalPage=showLegalPage}catch(e){}
+try{window.showPaywall=showPaywall}catch(e){}
+try{window.showWI=showWI}catch(e){}
+try{window.sid=sid}catch(e){}
+try{window.signOut=signOut}catch(e){}
+try{window.swTab=swTab}catch(e){}
+try{window.switchMain=switchMain}catch(e){}
+try{window.toggleFAQ=toggleFAQ}catch(e){}
+try{window.askSug=askSug}catch(e){}
+try{window.clearChat=clearChat}catch(e){}
+try{window.clearResults=clearResults}catch(e){}
+try{window.clearVault=clearVault}catch(e){}
+try{window.closeAuth=closeAuth}catch(e){}
+try{window.closeDrawer=closeDrawer}catch(e){}
+try{window.cm=cm}catch(e){}
+try{window.cmpClearFile=cmpClearFile}catch(e){}
+try{window.cmpDzDp=cmpDzDp}catch(e){}
+try{window.cmpDzLv=cmpDzLv}catch(e){}
+try{window.cmpDzOv=cmpDzOv}catch(e){}
+try{window.cmpHandleFile=cmpHandleFile}catch(e){}
+try{window.cmpTab=cmpTab}catch(e){}
+try{window.cpyEmail=cpyEmail}catch(e){}
+try{window.doPay=doPay}catch(e){}
+try{window.doSignIn=doSignIn}catch(e){}
+try{window.doSignUp=doSignUp}catch(e){}
+try{window.dzDp=dzDp}catch(e){}
+try{window.dzLv=dzLv}catch(e){}
+try{window.dzOv=dzOv}catch(e){}
+try{window.enterApp=enterApp}catch(e){}
+try{window.exportPDF=exportPDF}catch(e){}
+try{window.exportWord=exportWord}catch(e){}
+try{window.genEmail=genEmail}catch(e){}
+try{window.goHome=goHome}catch(e){}
+try{window.goLanding=goLanding}catch(e){}
+try{window.handleF=handleF}catch(e){}
+try{window.openAuth=openAuth}catch(e){}
+try{window.openDrawer=openDrawer}catch(e){}
+try{window.rewriteClause=rewriteClause}catch(e){}
+try{window.runAnalysis=runAnalysis}catch(e){}
+try{window.runCompare=runCompare}catch(e){}
+try{window.sPlan=sPlan}catch(e){}
+try{window.saveToVault=saveToVault}catch(e){}
+try{window.sendChat=sendChat}catch(e){}
+try{window.setDTfromSelect=setDTfromSelect}catch(e){}
+try{window.setLangFromSelect=setLangFromSelect}catch(e){}
+try{window.setRoleFromSelect=setRoleFromSelect}catch(e){}
+try{window.showF=showF}catch(e){}
+try{window.showLegalPage=showLegalPage}catch(e){}
+try{window.showPaywall=showPaywall}catch(e){}
+try{window.showWI=showWI}catch(e){}
+try{window.sid=sid}catch(e){}
+try{window.signOut=signOut}catch(e){}
+try{window.swTab=swTab}catch(e){}
+try{window.switchMain=switchMain}catch(e){}
+try{window.toggleFAQ=toggleFAQ}catch(e){}
 </script>
 </body>
 </html>
