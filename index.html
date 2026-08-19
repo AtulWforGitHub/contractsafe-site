@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" itemscope itemtype="https://schema.org/WebApplication">
 <head>
@@ -1877,19 +1878,45 @@ var _CSAK = "via-railway"; // API key handled by Railway proxy
 var _CSME = "https://contractsafe-email-production.up.railway.app"; // Email + Claude proxy server
 var _CSRK = "rzp_live_STaVeR7OUN2hui"; // Your Razorpay key
 
+// Single place to update the model. When Anthropic retires a model,
+// update ONLY this line (no need to hunt through the file).
+// Docs: https://platform.claude.com/docs/en/about-claude/models/overview
+var _CSMODEL = 'claude-sonnet-4-6';
+// Backup models tried automatically, in order, if the primary model
+// is retired/unavailable — so the site degrades gracefully instead
+// of hard-failing every scan until someone notices and redeploys.
+var _CSMODEL_FALLBACKS = ['claude-sonnet-4-5', 'claude-opus-4-8'];
+
 /* ─── CORS PROXY HELPER ─── */
 // Direct browser → Anthropic API calls are blocked by CORS.
 // This helper routes through a proxy so the HTML file works standalone.
 async function callClaude(payload) {
   const RAILWAY = 'https://contractsafe-email-production.up.railway.app/api/claude';
-  const resp = await fetch(RAILWAY, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(payload)
-  });
-  if (resp.ok) return resp;
-  const errData = await resp.json().catch(()=>({}));
-  throw new Error(errData?.error?.message || 'API error ' + resp.status);
+  const modelsToTry = [payload.model || _CSMODEL, ..._CSMODEL_FALLBACKS];
+  let lastErr;
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const attemptPayload = Object.assign({}, payload, { model: modelsToTry[i] });
+    try {
+      const resp = await fetch(RAILWAY, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(attemptPayload)
+      });
+      if (resp.ok) return resp;
+      const errData = await resp.json().catch(()=>({}));
+      const msg = errData?.error?.message || ('API error ' + resp.status);
+      // Only fall through to the next model on a "model not found /
+      // retired" style error. Other errors (bad request, rate limit,
+      // auth) should surface immediately rather than retrying blindly.
+      const isModelError = resp.status === 404 || /model/i.test(msg);
+      lastErr = new Error(msg);
+      if (!isModelError) throw lastErr;
+      console.warn('ContractSafe: model "' + modelsToTry[i] + '" failed (' + msg + '), trying fallback...');
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error('API error: all models failed');
 }
 
 /* ─── STATE ─── */
@@ -2611,7 +2638,7 @@ async function runAnalysis(){
       } else {
         msgContent = buildPrompt(text,docType);
       }
-      const resp=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:3500,messages:[{role:'user',content:msgContent}]});
+      const resp=await callClaude({model:_CSMODEL,max_tokens:3500,messages:[{role:'user',content:msgContent}]});
       const data=await resp.json();
       r=JSON.parse(data.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim());
     }
@@ -2782,7 +2809,7 @@ async function runCompare(){
         msgContent = buildComparePrompt(v1, v2);
       }
 
-      const resp=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:msgContent}]});
+      const resp=await callClaude({model:_CSMODEL,max_tokens:2000,messages:[{role:'user',content:msgContent}]});
       const data=await resp.json();
       r=JSON.parse(data.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim());
     }
@@ -2908,7 +2935,7 @@ async function rewriteClause(clause,id){
     btn.innerHTML='✍️ Rewrite This Clause Fairly';btn.disabled=false;return;
   }
   try{
-    const resp=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:`Rewrite this contract clause fairly for the signing party under Indian law. Just give the rewritten clause text only, no explanations.\n\nClause topic: "${clause}"\nDocument type: ${docType}`}]});
+    const resp=await callClaude({model:_CSMODEL,max_tokens:400,messages:[{role:'user',content:`Rewrite this contract clause fairly for the signing party under Indian law. Just give the rewritten clause text only, no explanations.\n\nClause topic: "${clause}"\nDocument type: ${docType}`}]});
     const data=await resp.json();
     const txt=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
     res.innerHTML=`<div class="rw-res"><div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:.4rem">✍️ FAIR VERSION — Copy and send to other party</div><div>${esc(txt)}</div></div>`;
@@ -2929,7 +2956,7 @@ async function genEmail(){
     return;
   }
   try{
-    const resp=await callClaude({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:`Write a professional negotiation email for a ${lastResult.doc_type} contract. Firm but respectful. Reference Indian standard practice. Ready to send as-is. Max 200 words. Points to negotiate:\n${pts.join('\n')}\n\nJust write the email body text, no subject line.`}]});
+    const resp=await callClaude({model:_CSMODEL,max_tokens:700,messages:[{role:'user',content:`Write a professional negotiation email for a ${lastResult.doc_type} contract. Firm but respectful. Reference Indian standard practice. Ready to send as-is. Max 200 words. Points to negotiate:\n${pts.join('\n')}\n\nJust write the email body text, no subject line.`}]});
     const data=await resp.json();
     eb.textContent=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
   }catch(e){eb.textContent='Failed to generate. Please try again.'}
@@ -3158,7 +3185,7 @@ Document excerpt: ${lastDocText.substring(0,3000)}
 Answer the user's follow-up question in plain English. Be specific to THIS contract. Reference Indian law where relevant. Keep response concise (max 150 words). Do NOT start with "I" — start with the answer directly.`;
 
       const resp = await callClaude({
-          model:'claude-sonnet-4-20250514',
+          model:_CSMODEL,
           max_tokens:400,
           system: systemCtx,
           messages: chatHistory
@@ -3603,7 +3630,7 @@ try{window.toggleFAQ=toggleFAQ}catch(e){}
       var ap=document.getElementById('page-app');
       if(ap)ap.style.display='none';
       if(lp){lp.style.display='block';window.scrollTo(0,0);}
-      history.pushState({page:'landing'},'',window.location.pathname);
+      try{history.pushState({page:'landing'},'',window.location.pathname);}catch(e){}
     }
   };
 
@@ -3618,7 +3645,7 @@ try{window.toggleFAQ=toggleFAQ}catch(e){}
       if(ap)ap.style.display='none';
       if(lp){lp.style.display='block';window.scrollTo(0,0);}
       // If no more history, push landing state again to prevent exit
-      if(!e.state){history.pushState({page:'landing'},'',location.pathname);}
+      if(!e.state){try{history.pushState({page:'landing'},'',location.pathname);}catch(err){}}
     }
   });
 
@@ -3628,8 +3655,8 @@ try{window.toggleFAQ=toggleFAQ}catch(e){}
   function csStart(){
     csInit();
     // Push landing state so back from app returns here, not exits website
-    history.replaceState({page:'landing'},'',location.pathname+location.search);
-    history.pushState({page:'landing'},'',location.pathname+location.search);
+    try{history.replaceState({page:'landing'},'',location.pathname+location.search);}catch(e){}
+    try{history.pushState({page:'landing'},'',location.pathname+location.search);}catch(e){}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',csStart);
   else csStart();
